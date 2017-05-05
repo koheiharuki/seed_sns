@@ -35,7 +35,6 @@ if (!empty($_POST)){
     }
   }
 
-
   //エラーがない場合
   if(empty($error)){
     //画像をアップロードする
@@ -47,6 +46,12 @@ if (!empty($_POST)){
     
     header('Location: check.php');
   }
+}
+
+//書き直し $_GETでもOK
+if (isset($_REQUEST['action']) && $_REQUEST['action'] == 'rewrite'){
+  $_POST = $_SESSION['join'];
+  $error['rewrite'] = true;
 }
 
 ?>
