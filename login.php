@@ -1,5 +1,17 @@
 <?php
+session_start();
 require('dbconnect.php');
+
+//自動ログイン処理
+if(isset($_COOKIE['email']) && !empty($_COOKIE['email'])){
+
+//COOKIEに保存されているログイン情報が、入力されてPOST送信されてきたかのように$_POSTに値を代入
+
+$_POST['email'] = $_COOKIE['email'];
+$_POST['password'] = $_COOKIE['password'];
+$_POST['save'] = 'on';
+}
+
 //post送信されていたら、emailとパスワードの入力チェックを行い、どちらかが(あるいは両方とも)未入力の場合、「メールアドレスとパスワードをご記入ください」とパスワードの入力欄の下に表示してください。
 //$error['login']にblankという文字をセットして判別できるようにすること
 
@@ -37,6 +49,15 @@ if (!empty($_POST)){
 
       //SESSION変数に、ログイン時間を記憶
       $_SESSION['time'] = time();
+
+      //自動ログインをONにしてたら、cookieにログイン情報を保存する
+      if($_POST['save'] == 'on'){
+        //setcookie（保存するキー,保存する値,保存する期間（秒））
+        setcookie('email',$_POST['email'],time() + 60*60*24*14);
+        setcookie('password',$_POST['password'],time() + 60*60*24*14);
+
+
+      }
 
       //ログイン後のindex.php（トップページ）に遷移
       header("Location: index.php");
@@ -119,8 +140,15 @@ if (!empty($_POST)){
               <?php if(isset($error['login']) && $error['login'] == 'faild'): ?>
               <p class="error">* ログインに失敗しました。正しくご記入ください。</p>
               <?php endif; ?>
-
             </div>
+          </div>
+          <!-- 自動ログインのチェックボックス -->
+          <div class="form-group">
+          <label class="col-sm-4 control-label">自動ログイン
+          </label>
+          <div class="col-sm-8"> 
+          <input type="checkbox" name="save" value="on">
+          </div> 
           </div>
           <input type="submit" class="btn btn-default" value="ログイン">
         </form>
